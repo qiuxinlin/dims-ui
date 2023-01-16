@@ -91,7 +91,6 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
-const manufacturerId = ref(0);
 const options = ref([]);
 
 const data = reactive({
