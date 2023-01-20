@@ -1,17 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
-      <el-form-item label="药品名称" prop="name">
-        <el-input v-model="queryDrugsParams.name" placeholder="请输入药品名称" clearable
-                  @keyup.enter="queryAllDrugs"/>
-      </el-form-item>
-      <el-form-item label="药品简码" prop="simpleCode">
-        <el-input v-model="queryDrugsParams.simpleCode" placeholder="请输入简码" clearable
-                  @keyup.enter="queryAllDrugs"/>
-      </el-form-item>
       <el-form-item label="就诊号" prop="visitNo">
-        <el-input v-model="queryParams.visitNo" placeholder="请输入就诊号" clearable
-                  @keyup.enter="queryAllDrugs"/>
+        <el-input v-model="queryParams.visitNo" placeholder="请输入就诊号" clearable/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -33,10 +24,9 @@
     </el-row>
 
     <el-table v-loading="loading" :data="dataList" @selection-change="handleSelectionChange">
+      <el-table-column label="就诊号" align="center" prop="visitNo"/>
       <el-table-column label="药品名称" align="center" prop="drugName"/>
-      <el-table-column label="操作类型" align="center" prop="operationName"/>
       <el-table-column label="数量" align="center" prop="quantity"/>
-      <el-table-column label="出库至" align="center" prop="outbound"/>
       <el-table-column label="操作人" align="center" prop="createBy"/>
       <el-table-column label="操作时间" align="center" prop="createTime" width="180">
         <template #default="scope">
@@ -52,7 +42,7 @@
     <el-dialog title="开单" v-model="createOrderOpen" width="500px" append-to-body>
       <el-form ref="postRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="就诊号" prop="visitNo">
-          <el-input v-model="queryParams.visitNo" placeholder="请输入就诊号"/>
+          <el-input v-model="form.visitNo" placeholder="请输入就诊号"/>
         </el-form-item>
         <el-form-item label="药品名称" prop="name">
           <el-input v-model="queryDrugsParams.name" placeholder="请输入药品名称" clearable
@@ -146,7 +136,7 @@ function reset() {
     id: undefined,
     drugId: undefined,
     quantity: undefined,
-    outbound: undefined
+    visitNo: undefined
   };
   proxy.resetForm("postRef");
 }

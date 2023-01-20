@@ -21,7 +21,7 @@ export function create(data) {
 //查询
 export function list(query) {
     return request({
-        url: '/stockRecords',
+        url: '/orders',
         method: 'post',
         data: query
     })
