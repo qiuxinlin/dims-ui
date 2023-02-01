@@ -15,18 +15,26 @@
         <el-button type="primary" plain icon="Plus" @click="createOrder">开单</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="success" plain icon="Edit" @click="stockOut">发药</el-button>
+        <el-button type="success" plain icon="Edit" @click="sendOutOrder" :disabled="single">发药</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="success" plain icon="Edit" @click="stockOut">退药</el-button>
+        <el-button type="success" plain icon="Edit" @click="sendBackOrder" :disabled="single">退药</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="dataList" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="就诊号" align="center" prop="visitNo"/>
       <el-table-column label="药品名称" align="center" prop="drugName"/>
       <el-table-column label="数量" align="center" prop="quantity"/>
+      <el-table-column label="状态" align="center" prop="status">
+        <template #default="scope">
+          <span v-if="scope.row.status=== 1">开单</span>
+          <span v-else-if="scope.row.status=== 2">发药</span>
+          <span v-else-if="scope.row.status=== 3">退药</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作人" align="center" prop="createBy"/>
       <el-table-column label="操作时间" align="center" prop="createTime" width="180">
         <template #default="scope">
@@ -38,7 +46,6 @@
     <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum"
                 v-model:limit="queryParams.pageSize" @pagination="getList"/>
 
-    <!-- 入库 -->
     <el-dialog title="开单" v-model="createOrderOpen" width="500px" append-to-body>
       <el-form ref="postRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="就诊号" prop="visitNo">
@@ -75,7 +82,7 @@
 </template>
 
 <script setup name="Order">
-import {create, queryDrugs, list} from "@/api/biz/order";
+import {create, queryDrugs, list, sendOut, sendBack} from "@/api/biz/order";
 
 const {proxy} = getCurrentInstance();
 
@@ -84,9 +91,9 @@ const createOrderOpen = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
-const multiple = ref(true);
 const total = ref(0);
 const drugs = ref([]);
+const single = ref(true);
 
 const data = reactive({
   form: {},
@@ -156,16 +163,14 @@ function resetQuery() {
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.id);
-  multiple.value = !selection.length;
+  single.value = selection.length == 0;
 }
 
-/** 入库 */
 function createOrder() {
   reset();
   createOrderOpen.value = true;
 }
 
-/** 提交入库 */
 function submitCreateOrder() {
   proxy.$refs["postRef"].validate(valid => {
     if (valid) {
@@ -175,6 +180,20 @@ function submitCreateOrder() {
         getList();
       });
     }
+  });
+}
+
+function sendOutOrder() {
+  sendOut(ids.value).then(response => {
+    proxy.$modal.msgSuccess("发药成功");
+    getList();
+  });
+}
+
+function sendBackOrder() {
+  sendBack(ids.value).then(response => {
+    proxy.$modal.msgSuccess("退药成功");
+    getList();
   });
 }
 

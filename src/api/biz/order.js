@@ -27,3 +27,18 @@ export function list(query) {
     })
 }
 
+export function sendOut(data) {
+    return request({
+        url: '/order/sendOut',
+        method: 'post',
+        data: data
+    })
+}
+
+export function sendBack(data) {
+    return request({
+        url: '/order/sendBack',
+        method: 'post',
+        data: data
+    })
+}
